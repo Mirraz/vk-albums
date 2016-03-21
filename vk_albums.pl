@@ -10,7 +10,7 @@ use IO::Socket::SSL;
 
 binmode(STDOUT,':utf8');
 
-my $agent = 'Mozilla/5.0 (X11; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/33.0';
+my $agent = 'Mozilla/5.0 (X11; Linux x86_64; rv:36.0) Gecko/20100101 Firefox/36.0';
 my $ua = LWP::UserAgent->new(
 	agent => $agent,
 );
@@ -106,7 +106,7 @@ sub getAlbums {
 		$albums_id,
 		'moreFromAlbum',
 		'albumCount',
-		qr/\s*onPrivacyChanged:\s*photos.privacy\s*/
+		qr/\s*onPrivacyChanged:\s*photos.privacy\s*,?/
 	);
 	print "albumCount: $albumCount\n";
 
