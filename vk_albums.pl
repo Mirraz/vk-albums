@@ -104,8 +104,8 @@ sub getAlbums {
 
 	my $albumCount = getItemsCount(
 		$albums_id,
-		'moreFromAlbum',
-		'albumCount',
+		'moreFromAlbums',
+		'albumsCount',
 		qr/\s*onPrivacyChanged:\s*photos.privacy\s*,?/
 	);
 	print "albumCount: $albumCount\n";
@@ -115,7 +115,7 @@ sub getAlbums {
 		scalar @_ == 3 or die;
 		my ($rows, $privacy, $album) = @_;
 		$privacy =~ s/^<!json>// or die $privacy;
-		$album =~ s/^<!bool>// or die $album;
+		$album eq 'albums' or die; # TODO: hotfixed, remove?
 	
 		my $html = HTML::TreeBuilder::XPath->new;
 		$html->parse_content($rows);
@@ -127,19 +127,19 @@ sub getAlbums {
 
 		for my $photo_row($body->content_list()) {
 			$photo_row->tag eq 'div' or die;
-			$photo_row->attr('class') eq 'photo_row' or die;
+			#$photo_row->attr('class') eq 'photo_row' or die; # TODO: check if contains
 
-			my $img_link_set = $photo_row->findnodes('div[@class="cont"]/a[contains(@class,"img_link")]');
+			my $img_link_set_xpath = './/a[contains(concat(" ", normalize-space(@class), " "), " img_link ")]';
+			my $img_link_set = $photo_row->findnodes($img_link_set_xpath);
 			$img_link_set->size == 1 or die $img_link_set->size;
 			my $img_link = $img_link_set->shift;
 			my $album_href = $img_link->attr('href');
 			defined $album_href or die;
 			$album_href =~ s/^\///;
 
-			my $title = $img_link->findvalue(
-				'div[@class="photo_album_title"]/div[@class="clear_fix"]/div[contains(@class,"ge_photos_album")]'
-			);
-			defined $title or die;
+			my $title_xpath = './/div[contains(concat(" ", normalize-space(@class), " "), " photos_album_title ")]';
+			$img_link->exists($title_xpath) or die;
+			my $title = $img_link->findvalue($title_xpath);
 
 			push @albums, {href => $album_href, title => $title};
 		}
