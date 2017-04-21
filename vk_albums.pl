@@ -119,16 +119,11 @@ sub getAlbums {
 	
 		my $html = HTML::TreeBuilder::XPath->new;
 		$html->parse_content($rows);
-		my @c = grep {$_->tag eq 'body'} $html->content_list();
-		scalar @c == 1 or die;
-		my $body = $c[0];
-		undef @c;
-		$body->tag eq 'body' or die;
+		my $photo_row_set_xpath = './/div[contains(concat(" ", normalize-space(@class), " "), " photo_row ")]';
+		my @photo_rows = $html->findnodes($photo_row_set_xpath);
+		scalar @photo_rows > 0 or die;
 
-		for my $photo_row($body->content_list()) {
-			$photo_row->tag eq 'div' or die;
-			#$photo_row->attr('class') eq 'photo_row' or die; # TODO: check if contains
-
+		for my $photo_row(@photo_rows) {
 			my $img_link_set_xpath = './/a[contains(concat(" ", normalize-space(@class), " "), " img_link ")]';
 			my $img_link_set = $photo_row->findnodes($img_link_set_xpath);
 			$img_link_set->size == 1 or die $img_link_set->size;
