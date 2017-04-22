@@ -4,6 +4,13 @@ vk.com albums downloader.
 This perl-script downloads all photo-albums of given group.
 You don't need to be logged in to site.
 
+## Requirements
+Script uses this perl modules:
+* `LWP::UserAgent`
+* `JSON::PP`
+* `HTML::TreeBuilder`
+* `HTML::TreeBuilder::XPath`
+
 ## Usage
 
 ```
